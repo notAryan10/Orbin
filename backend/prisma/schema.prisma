@@ -1,0 +1,105 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String            @id @default(uuid())
+  email            String            @unique
+  password         String
+  name             String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  attempts         Attempt[]
+  createdDocuments Document[]
+  quizzes          Quiz[]
+  workspaces       Workspace[]       @relation("OwnerWorkspaces")
+  sharedWorkspaces WorkspaceMember[]
+}
+
+model Workspace {
+  id          String            @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  documents   Document[]
+  quizzes     Quiz[]
+  owner       User              @relation("OwnerWorkspaces", fields: [ownerId], references: [id])
+  members     WorkspaceMember[]
+}
+
+model WorkspaceMember {
+  id          String    @id @default(uuid())
+  workspaceId String
+  userId      String
+  role        String    @default("viewer")
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, userId])
+}
+
+model Document {
+  id          String          @id @default(uuid())
+  title       String
+  content     String?
+  filePath    String
+  fileType    String
+  workspaceId String
+  ownerId     String
+  status      String          @default("PENDING")
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  owner       User            @relation(fields: [ownerId], references: [id])
+  workspace   Workspace       @relation(fields: [workspaceId], references: [id])
+  chunks      DocumentChunk[]
+}
+
+model DocumentChunk {
+  id         String   @id @default(uuid())
+  content    String
+  index      Int
+  documentId String
+  createdAt  DateTime @default(now())
+  document   Document @relation(fields: [documentId], references: [id])
+}
+
+model Quiz {
+  id          String     @id @default(uuid())
+  title       String
+  workspaceId String
+  creatorId   String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  attempts    Attempt[]
+  questions   Question[]
+  creator     User       @relation(fields: [creatorId], references: [id])
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id])
+}
+
+model Question {
+  id            String @id @default(uuid())
+  text          String
+  options       String
+  correctAnswer String
+  quizId        String
+  quiz          Quiz   @relation(fields: [quizId], references: [id])
+}
+
+model Attempt {
+  id        String   @id @default(uuid())
+  score     Int
+  userId    String
+  quizId    String
+  createdAt DateTime @default(now())
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
