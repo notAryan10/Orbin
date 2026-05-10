@@ -10,21 +10,17 @@ const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
     
     try {
       await authApi.register({ name, email, password });
       navigate('/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed.');
-    } finally {
-      setIsLoading(false);
     }
   };
 

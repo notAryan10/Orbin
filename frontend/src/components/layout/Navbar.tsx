@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, User, LogOut, Layout } from 'lucide-react';
+import { BookOpen, LogOut, Layout } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {

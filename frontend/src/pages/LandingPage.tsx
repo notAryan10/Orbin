@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Sparkles, FileText, Zap, Shield, Users } from 'lucide-react';
+import { Brain, Sparkles, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
