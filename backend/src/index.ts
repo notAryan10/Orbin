@@ -44,13 +44,20 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(frontendPath));
   
   // Handle SPA routing
-  app.get('*', (req: Request, res: Response, next: NextFunction) => {
+  app.get('/*', (req: Request, res: Response, next: NextFunction) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
+
+// 404 Handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({
+    message: "Route not found"
+  });
+});
 
 // Error Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

@@ -1,0 +1,106 @@
+name: Full CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  # =========================
+  # BACKEND TEST + BUILD
+  # =========================
+  backend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      # Clone repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Install Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Install backend dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # Generate Prisma Client
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      # Run lint checks
+      - name: Lint Backend
+        run: npm run lint
+
+      # Run backend tests
+      - name: Run Backend Tests
+        run: npm test
+
+      # Build backend
+      - name: Build Backend
+        run: npm run build
+
+
+  # =========================
+  # FRONTEND TEST + BUILD
+  # =========================
+  frontend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      # Clone repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Install frontend dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # Lint frontend
+      - name: Lint Frontend
+        run: npm run lint
+
+      # Run frontend tests
+      - name: Run Frontend Tests
+        run: npm test
+
+      # Build frontend
+      - name: Build Frontend
+        run: npm run build
+
+
+  # =========================
+  # DOCKER BUILD CHECK
+  # =========================
+  docker-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Setup Docker Buildx
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Verify Docker build
+      - name: Docker Compose Build
+        run: docker compose build

@@ -12,7 +12,7 @@ WORKDIR /app/backend
 COPY backend/package*.json ./
 # Prisma needs openssl to generate the client
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY backend/ ./
 RUN npx prisma generate
 RUN npm run build
